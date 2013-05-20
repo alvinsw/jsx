@@ -60,7 +60,7 @@ Logger.prototype.getLogLevel = function(cb) {
  * A log request with specified level equal to or more than the error level will be sent to STDERR 
  */
 Logger.prototype.setErrorLevel = function(level) {
-  levelLimit = getLevel(level).n;
+  errorLimit = getLevel(level).n;
   return this;
 };
 
@@ -86,7 +86,7 @@ levelsStr.forEach( function(level) {
   };
 });
 
-module.exports = function(cModule) {
+var factory = module.exports = function(cModule) {
   var filename = '';
   if (cModule) {
     if (typeof cModule == 'string') filename = cModule;
@@ -96,3 +96,13 @@ module.exports = function(cModule) {
   return new Logger(filename);
 }
 
+Object.defineProperties(factory, {
+  level : {
+    get: function() { return levelLimit; },
+    set: function(level) { levelLimit = getLevel(level).n; }
+    },
+  errorThreshold : {
+    get: function() { return errorLimit; },
+    set: function(level) { errorLimit = getLevel(level).n; }
+    },
+});
