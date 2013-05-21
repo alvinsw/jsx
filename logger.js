@@ -44,13 +44,13 @@ function Logger(filename) {
 }
 
 /** Sets the current log level. Any log request specified at lower level will not be displayed. */
-Logger.prototype.setLogLevel = function(level) {
+Logger.prototype.setLevel = function(level) {
   levelLimit = getLevel(level).n;
   return this;
 };
 
 /** Gets the current log level. */
-Logger.prototype.getLogLevel = function(cb) {
+Logger.prototype.getLevel = function(cb) {
   cb(levelLimit, levelsStr[levelLimit]);
   return this;
 };
@@ -59,13 +59,13 @@ Logger.prototype.getLogLevel = function(cb) {
  * Sets the current error level. Error level specifies a level that is considered as an error or worse. 
  * A log request with specified level equal to or more than the error level will be sent to STDERR 
  */
-Logger.prototype.setErrorLevel = function(level) {
+Logger.prototype.setErrorThreshold = function(level) {
   errorLimit = getLevel(level).n;
   return this;
 };
 
 /** Gets the current error level. */
-Logger.prototype.getErrorLevel = function(cb) {
+Logger.prototype.getErrorThreshold = function(cb) {
   cb(errorLimit, levelsStr[errorLimit]);
   return this;
 };
