@@ -9,7 +9,7 @@ function defaultEnumerator(container, onEachItem) {
     }
   } else {
     var keys = Object.keys(container);
-    for (i = 0; i<container.length; ++i) {
+    for (i = 0; i<keys.length; ++i) {
       val = onEachItem(container[keys[i]]);
       if (val) return val;
     }
@@ -25,7 +25,7 @@ function defaultReverseEnumerator(container, onEachItem) {
     }
   } else {
     var keys = Object.keys(container);
-    for (i=container.length; i--; ) {
+    for (i = keys.length; i--; ) {
       val = onEachItem(container[keys[i]]);
       if (val) return val;
     }
