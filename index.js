@@ -210,3 +210,4 @@ exports.Wildcard = require('./Wildcard');
 exports.fsx = require('./fsx');
 exports.string = require('./string');
 exports.array = require('./array');
+exports.algo = exports.algorithm = require('./algorithm');

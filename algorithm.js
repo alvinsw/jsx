@@ -1,50 +1,60 @@
 exports.traversal = {};
 
 function defaultEnumerator(container, onEachItem) {
-  if (typeof container !== 'object') return;
-  var val;
+  var val, i;
   if (Array.isArray(container)) {
-    for (var i=0; i<container.length; ++i) {
+    for (i = 0; i<container.length; ++i) {
       val = onEachItem(container[i]);
       if (val) return val;
     }
   } else {
-    for (var key in container) {
-      val = onEachItem(container[key]);
+    var keys = Object.keys(container);
+    for (i = 0; i<container.length; ++i) {
+      val = onEachItem(container[keys[i]]);
       if (val) return val;
     }
   }
 }
 
+function defaultReverseEnumerator(container, onEachItem) {
+  var val, i;
+  if (Array.isArray(container)) {
+    for (i=container.length; i--; ) {
+      val = onEachItem(container[i]);
+      if (val) return val;
+    }
+  } else {
+    var keys = Object.keys(container);
+    for (i=container.length; i--; ) {
+      val = onEachItem(container[keys[i]]);
+      if (val) return val;
+    }
+  }
+}
 
-exports.bfsTree = function(container, onEachItem, getChildren, forEach) {
-  if (typeof container !== 'object') return;
+/** if onEachItem return true, the function will return and traversal terminates */
+exports.bfsTree = function(root, onEachItem, getContainer, forEach) {
   forEach = forEach || defaultEnumerator;
-  getChildren = getChildren || function(e){return e;};
-  var queue = [container];
+  getContainer = getContainer || function(e){return e;};
+  var queue = [root];
   while (queue.length > 0) {
-    var c = queue.shift();
-    forEach(c, function(element) {
-      var ret = onEachItem(element);
-      if (ret) return ret;
-      var children = getChildren(element);
-      if (children) queue.push(children);
-    });
+    var node = queue.shift();
+    var val = onEachItem(node);
+    if (val) return val;
+    var children = getContainer(node);
+    if (children) forEach(children, function(child) { queue.push(child); });
   }
 };
 
-exports.dfsTree = function(container, onEachItem, getChildren, forEach) {
-  if (typeof container !== 'object') return;
-  forEach = forEach || defaultEnumerator;
-  getChildren = getChildren || function(e){return e;};
-  var stack = [container];
+exports.dfsTree = function(root, onEachItem, getContainer, forEach) {
+  forEach = forEach || defaultReverseEnumerator;
+  getContainer = getContainer || function(e){return e;};
+  var stack = [root];
   while (stack.length > 0) {
-    var c = stack.pop();
-    forEach(c, function(element) {
-      var ret = onEachItem(element);
-      if (ret) return ret;
-      var children = getChildren(element);
-      if (children) stack.push(children);
-    });
+    var node = stack.pop();
+    var val = onEachItem(node);
+    if (val) return val;
+    var children = getContainer(node);
+    if (children) forEach(children, function(child) { stack.push(child); });
   }
 };
