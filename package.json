@@ -1,14 +1,21 @@
 {
   "name": "jsx",
-  "version": "0.0.1",
-  "author": "",
-  "description": "",
+  "version": "0.0.2",
+  "author": {
+    "name": "Alvin Sebastian",
+    "email": "a.sebastian@qut.edu.au"
+  },
+  "description": "JavaScript eXtended functions. This module provides various helpers for Node JS.",
   "contributors": [],
   "main": "./index.js",
   "keywords": [],
   "dependencies": {
   },
   "noAnalyze": true,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:alvinsw/jsx.git"
+  },
   "devDependencies": {},
   "optionalDependencies": {}
 }

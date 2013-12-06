@@ -1,25 +1,32 @@
 var path = require('path');
 
-var levels = {debug:0, info:1, warn:2, error:3, fatal:4};
-var levelsStr = Object.keys(levels);
-var levelLimit = 0;
-var errorLimit = 3;
+var levels = {debug:10, info:20, notice:30, warn:50, warning:50, error:70, critical:80, fatal:100};
+var levelsDict = {string:{}, number:{}};
+
+(function(){
+  for (var key in levels) {
+    var val = levels[key];
+    var levelObj = {s: key, n: val};
+    levelsDict['string'][key] = levelObj;
+    levelsDict['number'][val] = levelObj;
+  }
+})();
+var levelLimit = 0; //display all
+var errorLimit = 70; //output >error to stderr
 var useRelativePath = true;
 
 function getLevel(level) {
-  var levelObj = {};
-  if (typeof level === 'string') {
-    levelObj.s = level;
-    levelObj.n = levels[level];
-    if (typeof levelObj.n === 'undefined') throw new Error('Invalid log level.');
-  } else if (typeof level === 'number'){
-    levelObj.n = level;
-    levelObj.s = levelsStr[level];
-    if (typeof levelObj.s === 'undefined') throw new Error('Invalid log level.');
+  var levelType = levelsDict[typeof level];
+  if (levelType) {
+    var levelObj = levelType[level];
+    if (typeof levelObj === 'undefined') {
+      if (levelType === 'number') levelObj = {s:'level'+level, n:level};
+      else throw new Error('Invalid log level.');
+    }
+    return levelObj;
   } else {
     throw new Error('Log level must be string or number.');
   }
-  return levelObj;
 }
 
 function log(level, data) {
@@ -37,7 +44,7 @@ function log(level, data) {
       console.log('');
     }
   }
-};
+}
 
 function Logger(filename) {
   this.filename = filename;
@@ -51,7 +58,7 @@ Logger.prototype.setLevel = function(level) {
 
 /** Gets the current log level. */
 Logger.prototype.getLevel = function(cb) {
-  cb(levelLimit, levelsStr[levelLimit]);
+  cb(levelLimit, getLevel(levelLimit).s);
   return this;
 };
 
@@ -66,7 +73,7 @@ Logger.prototype.setErrorThreshold = function(level) {
 
 /** Gets the current error level. */
 Logger.prototype.getErrorThreshold = function(cb) {
-  cb(errorLimit, levelsStr[errorLimit]);
+  cb(errorLimit, getLevel(errorLimit).s);
   return this;
 };
 
@@ -78,13 +85,17 @@ Logger.prototype.useRelativePath = function(value) {
 };
 
 Logger.prototype.log = log;
-levelsStr.forEach( function(level) {
-  Logger.prototype[level] = function() {
-    var args = Array.prototype.slice.call(arguments);
-    args.unshift(level);
-    log.apply(this, args);
-  };
-});
+(function() {
+  for (var key in levels) {
+    (function(level){
+      Logger.prototype[level] = function() {
+        var args = Array.prototype.slice.call(arguments);
+        args.unshift(level);
+        log.apply(this, args);
+      };
+    })(key);
+  }
+})();
 
 var factory = module.exports = function(cModule) {
   var filename = '';
@@ -94,7 +105,7 @@ var factory = module.exports = function(cModule) {
   }
   if (useRelativePath) filename = path.join(path.relative(process.cwd(), path.dirname(filename)), path.basename(filename));
   return new Logger(filename);
-}
+};
 
 Object.defineProperties(factory, {
   level : {

@@ -1,3 +1,5 @@
+var typeCheck = def(process.env.NODE_JSX_TYPECHECK, 1);
+
 /**
  * A Utility object to manage namespace-like structure using javascript objects
 */
@@ -202,6 +204,46 @@ function Options(given, defaults) {
   return opt;
 }
 
+/** Check for undefined and provide default value */
+function def(val, defVal) {
+  return (null != val ? val : defVal);
+}
+
+/** Check for undefined and accepted type and provide default value */
+function deftc(val, defVal, validTypes) {
+  if (null == val) return defVal;
+  if (null == validTypes) return val;
+  if (!Array.isArray(validTypes)) validTypes = [validTypes];
+  var onEachType = function(typeName){ return typeof val === typeName; };
+  if (validTypes.some(onEachType)) return val;
+  else throw new TypeError('Argument type does not match any of: ' + validTypes.toString());
+}
+
+if (typeCheck) exports.def = deftc;
+else exports.def = def;
+
+exports.mapArgs = function(specs, cb) {
+  return function() {
+    var newArgs = [];
+    var i;
+    var j = 0;
+    specs.forEach(function(spec) { newArgs.push(spec[1]); });
+    for (i = 0; i < arguments.length; ++i) {
+      var val = arguments[i];
+      while (j < specs.length - (arguments.length - 1 - i)) {
+        if (typeof val === specs[j][0]) {
+          newArgs[j++] = val;
+          val = undefined;
+          break;
+        }
+        j++;
+      }
+      if (null != val) throw new TypeError('Type mismatch at argument ' + i );
+    }
+    return cb.apply(this, newArgs);
+  }
+}
+
 exports.Namespace = Namespace;
 exports.Class = Class;
 exports.Options = Options;
@@ -210,4 +252,9 @@ exports.Wildcard = require('./Wildcard');
 exports.fsx = require('./fsx');
 exports.string = require('./string');
 exports.array = require('./array');
+exports.object = require('./object');
 exports.algo = exports.algorithm = require('./algorithm');
+exports.async = require('./async');
+
+exports.forEach = exports.algo.forEach;
+exports.forEachReverse = exports.algo.forEachReverse;

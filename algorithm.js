@@ -1,16 +1,18 @@
+'use strict';
+
 exports.traversal = {};
 
 function defaultEnumerator(container, onEachItem) {
   var val, i;
   if (Array.isArray(container)) {
     for (i = 0; i<container.length; ++i) {
-      val = onEachItem(container[i]);
+      val = onEachItem(container[i], i, container);
       if (val) return val;
     }
   } else {
     var keys = Object.keys(container);
     for (i = 0; i<keys.length; ++i) {
-      val = onEachItem(container[keys[i]]);
+      val = onEachItem(container[keys[i]], keys[i], container);
       if (val) return val;
     }
   }
@@ -20,17 +22,20 @@ function defaultReverseEnumerator(container, onEachItem) {
   var val, i;
   if (Array.isArray(container)) {
     for (i=container.length; i--; ) {
-      val = onEachItem(container[i]);
+      val = onEachItem(container[i], i, container);
       if (val) return val;
     }
   } else {
     var keys = Object.keys(container);
     for (i = keys.length; i--; ) {
-      val = onEachItem(container[keys[i]]);
+      val = onEachItem(container[keys[i]], keys[i], container);
       if (val) return val;
     }
   }
 }
+
+exports.forEach = defaultEnumerator;
+exports.forEachReverse = defaultReverseEnumerator;
 
 /** if onEachItem return true, the function will return and traversal terminates */
 exports.bfsTree = function(root, onEachItem, getContainer, forEach) {

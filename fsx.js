@@ -16,6 +16,8 @@ module.exports = {
     writeJson : writeJsonFile
   },
   sync: {
+    dirExists: dirExists,
+    fileExists: fileExists,
     forEach: forEachSync,
     filteredForEach: filteredForEachSync,
     forEachFile: forEachFileSync,
@@ -600,4 +602,20 @@ function writeJsonFile(file, obj, callback) {
 function writeJsonFileSync(file, obj) {
     var str = JSON.stringify(obj, null, module.exports.spaces);
     return fs.writeFileSync(file, str); //not sure if fs.writeFileSync returns anything, but just in case
+}
+
+function dirExists(pathToDir) {
+  try { 
+    return fs.statSync(pathToDir).isDirectory();
+  } catch (err) { 
+    return false;
+  }
+}
+
+function fileExists(pathToFile) {
+  try { 
+    return fs.statSync(pathToDir).isFile();
+  } catch (err) { 
+    return false;
+  }
 }
