@@ -9,7 +9,7 @@ exports.each = exports.forEach = function(container, onEachItem, onFinish) {
     if (err) return onFinish(err);
     var item = stack.pop();
     var nextCb = onFinish;
-    if (item != null) nextCb = function() { onEachItem(item, next); };
+    if (item != null) nextCb = function() { onEachItem(item, next, onFinish); };
     process.nextTick(nextCb);
   })();
 }
